@@ -1,0 +1,9 @@
+<h1 style="color: darkblue;">"なんちゃってステイウォッチ(仮)"</h1>
+<h2 style="color: darkred;">あなたのPriIPアドレスは{{.myIp}}です。</h2>
+<h3>{{.result}}</h3>
+
+<script>
+    //h3の中身の文字例のすべての「ぬ」を削除して<br>タグを挿入する
+    const h3 = document.querySelector('h3');
+    h3.innerHTML = h3.textContent;
+</script>
