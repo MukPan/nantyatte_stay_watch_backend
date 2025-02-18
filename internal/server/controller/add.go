@@ -3,7 +3,7 @@ package controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"nantyatte_stay_watch/cmd"
+	"nantyatte_stay_watch/pkg/commands"
 	"net/http"
 )
 
@@ -13,12 +13,12 @@ func Add(c *gin.Context) {
 	ipFromWeb := c.ClientIP()
 
 	//IPアドレスとMACアドレスの対応表を取得
-	deviceInfos := cmd.GetDeviceInfos()
-	cmd.PrintDeviceInfos(deviceInfos)
+	deviceInfos := commands.GetDeviceInfos()
+	commands.PrintDeviceInfos(deviceInfos)
 
 	//MACアドレスを取得
-	macAddr := cmd.SearchMacAddr(deviceInfos, ipFromWeb)
-	cmd.RegistMacAddrList(macAddr)
+	macAddr := commands.SearchMacAddr(deviceInfos, ipFromWeb)
+	commands.RegistMacAddrList(macAddr)
 
 	//自身のMACアドレスを表示
 	fmt.Println("自身の IPアドレス:", ipFromWeb)

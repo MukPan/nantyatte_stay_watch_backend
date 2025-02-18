@@ -2,17 +2,17 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"nantyatte_stay_watch/cmd"
+	"nantyatte_stay_watch/pkg/commands"
 	"net/http"
 )
 
 func Get(c *gin.Context) {
 	//登録済みのIPアドレスリストを取得
-	registerdDeviceInfos := cmd.GetRegisterdDeviceInfos()
+	registerdDeviceInfos := commands.GetRegisterdDeviceInfos()
 
 	//接続中のIPアドレスを格納するマップを取得
-	connectingDeviceInfosMap := cmd.SendPingAll(registerdDeviceInfos)
-	cmd.PrintConnectingDeviceInfosMap(connectingDeviceInfosMap)
+	connectingDeviceInfosMap := commands.SendPingAll(registerdDeviceInfos)
+	commands.PrintConnectingDeviceInfosMap(connectingDeviceInfosMap)
 
 	//HTMLを返す
 	c.HTML(http.StatusOK, "index.html", gin.H{})
