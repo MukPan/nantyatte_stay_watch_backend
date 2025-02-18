@@ -7,11 +7,8 @@ import (
 	"net/http"
 )
 
-// 接続中のMACアドレスを格納するマップ
-var connectingMacAddrMap = make(map[string]bool)
-
-// Home ホーム画面(仮登録画面、アクセスしたら自動的にMACアドレス登録)
-func Home(c *gin.Context) {
+// Add 自身のMACアドレスを追加
+func Add(c *gin.Context) {
 	//web経由でアクセスしてきたIPアドレスを取得
 	ipFromWeb := c.ClientIP()
 
@@ -21,6 +18,7 @@ func Home(c *gin.Context) {
 
 	//MACアドレスを取得
 	macAddr := cmd.SearchMacAddr(deviceInfos, ipFromWeb)
+	cmd.RegistMacAddrList(macAddr)
 
 	//自身のMACアドレスを表示
 	fmt.Println("自身の IPアドレス:", ipFromWeb)

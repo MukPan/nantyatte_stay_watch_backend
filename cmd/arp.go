@@ -11,6 +11,31 @@ type DeviceInfo struct {
 	MacAddr string
 }
 
+// RegisteredMacAddrList 登録済MACアドレスリスト
+var RegisteredMacAddrList = make([]string, 0, 30)
+
+func GetIpAddrList() []string {
+	//IPアドレスとMACアドレスの対応表を取得
+	deviceInfos := GetDeviceInfos()
+	PrintDeviceInfos(deviceInfos)
+
+	//登録済みのMACアドレスから各IPアドレスを取得
+	ipAddrList := make([]string, 0, 30)
+	for _, macAddr := range RegisteredMacAddrList {
+		ipAddr := SearchIPAddr(deviceInfos, macAddr)
+		if ipAddr != "" {
+			ipAddrList = append(ipAddrList, ipAddr)
+		}
+	}
+
+	return ipAddrList
+}
+
+// RegistMacAddrList MACアドレスを新規登録する関数
+func RegistMacAddrList(macAddr string) {
+	RegisteredMacAddrList = append(RegisteredMacAddrList, macAddr)
+}
+
 // GetDeviceInfos 2つのデバイス情報を取得する関数
 func GetDeviceInfos() []DeviceInfo {
 	//arpリクエストをローカル全体に送りつける
@@ -57,6 +82,17 @@ func SearchMacAddr(deviceInfos []DeviceInfo, ipAddr string) string {
 	return ""
 }
 
+// SearchIPAddr MACアドレスを検索しIPアドレスを取得する関数
+func SearchIPAddr(deviceInfos []DeviceInfo, macAddr string) string {
+	for _, deviceInfo := range deviceInfos {
+		//一致するIPを見つけたらMACアドレスを返す
+		if deviceInfo.MacAddr == macAddr {
+			return deviceInfo.IpAddr
+		}
+	}
+	return ""
+}
+
 // コマンドの出力を取得する関数
 func execCmd(cmd *exec.Cmd) string {
 	out, err := cmd.CombinedOutput()
@@ -81,3 +117,5 @@ func getIpMacAddr(arpOutLines string) (ipAddr string, macAddr string) {
 	macAddr = elems[3]
 	return ipAddr, macAddr
 }
+
+//TODO: DeviceInfo型のクラスのようなものが欲しい

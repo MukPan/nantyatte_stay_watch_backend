@@ -6,15 +6,25 @@ import (
 )
 
 func Init() {
-	engine := gin.Default()
+	router := gin.Default()
 	// htmlのディレクトリを指定
-	engine.LoadHTMLGlob("templates/*")
-	//home
-	engine.GET("/", controller.Home)
+	router.LoadHTMLGlob("templates/*")
+
+	// V1の設定
+	v1 := router.Group("/api/v1/")
+
+	//自身のMACアドレスを追加
+	v1.GET("/add", controller.Add)
+
+	//全てのMACアドレスに対して応答確認
+	v1.GET("/get", controller.Get)
+
+	//ローカルのIPアドレスを確認
+	//v1.GET("/ip", controller.GetLocalIP)
 
 	//10秒ごとにgoルーチンを実行
 	//go execPing()
 
 	//サーバ起動
-	engine.Run(":3000")
+	router.Run(":3000")
 }
