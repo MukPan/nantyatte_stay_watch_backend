@@ -8,11 +8,11 @@ import (
 
 func Get(c *gin.Context) {
 	//登録済みのIPアドレスリストを取得
-	registeredIpAddrList := cmd.GetIpAddrList()
+	registerdDeviceInfos := cmd.GetRegisterdDeviceInfos()
 
 	//接続中のIPアドレスを格納するマップを取得
-	connectingIpAddrMap := cmd.SendPingAll(registeredIpAddrList)
-	cmd.PrintConnectingIpAddrMap(connectingIpAddrMap)
+	connectingDeviceInfosMap := cmd.SendPingAll(registerdDeviceInfos)
+	cmd.PrintConnectingDeviceInfosMap(connectingDeviceInfosMap)
 
 	//HTMLを返す
 	c.HTML(http.StatusOK, "index.html", gin.H{})

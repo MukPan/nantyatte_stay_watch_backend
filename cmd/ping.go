@@ -6,29 +6,30 @@ import (
 	"sync"
 )
 
-func SendPingAll(ipAddrList []string) (connectingIpAddrMap map[string]bool) {
-	//IPアドレスが接続しているか否かを格納するマップ
-	connectingIpAddrMap = make(map[string]bool)
+// SendPingAll 指定した全IPアドレスにpingを送信する関数
+func SendPingAll(deviceInfos []DeviceInfo) (connectingDeviceInfosMap map[DeviceInfo]bool) {
+	//MACアドレスが接続しているか否かを格納するマップ
+	connectingDeviceInfosMap = make(map[DeviceInfo]bool)
 
 	//データ送受信用チャンネルを作成
 	var wg = sync.WaitGroup{}
-	wg.Add(len(ipAddrList)) //IPアドレスの数だけgoroutineを立てる
+	wg.Add(len(deviceInfos)) //IPアドレスの数だけgoroutineを立てる
 
 	//アクセスするごとにgoroutineを立てpingを送信
-	for _, ipAddr := range ipAddrList {
-		go sendPing(ipAddr, connectingIpAddrMap, &wg)
+	for _, deviceInfo := range deviceInfos {
+		go sendPing(deviceInfo, connectingDeviceInfosMap, &wg)
 	}
 
 	//全てのgoroutineが終了するまで待機
 	wg.Wait()
 
-	return connectingIpAddrMap
+	return connectingDeviceInfosMap
 }
 
 // pingの送信が成功したかを返す関数
-func sendPing(targetIpAddr string, connectingIpAddrMap map[string]bool, wg *sync.WaitGroup) {
+func sendPing(targetDeviceInfo DeviceInfo, connectingDeviceInfosMap map[DeviceInfo]bool, wg *sync.WaitGroup) {
 	pingCmd := exec.Command("sh", "-c",
-		fmt.Sprintf("ping %s -o -c 1", targetIpAddr))
+		fmt.Sprintf("ping %s -o -c 1", targetDeviceInfo.IpAddr))
 	out, err := pingCmd.CombinedOutput()
 
 	//確認用
@@ -36,15 +37,19 @@ func sendPing(targetIpAddr string, connectingIpAddrMap map[string]bool, wg *sync
 
 	//結果をマップに代入
 	isConnecting := err == nil
-	connectingIpAddrMap[targetIpAddr] = isConnecting
+	connectingDeviceInfosMap[targetDeviceInfo] = isConnecting
 
 	//終了報告
 	wg.Done()
 }
 
-func PrintConnectingIpAddrMap(connectingIpAddrMap map[string]bool) {
+func PrintConnectingDeviceInfosMap(connectingDeviceInfosMap map[DeviceInfo]bool) {
 	fmt.Println("--接続中のIPアドレス--")
-	for ipAddr, isConnecting := range connectingIpAddrMap {
-		fmt.Println("IP:", ipAddr, "接続中:", isConnecting)
+	for deviceInfo, isConnecting := range connectingDeviceInfosMap {
+		fmt.Println(
+			"IP:", deviceInfo.IpAddr,
+			"Mac:", deviceInfo.MacAddr,
+			"接続中:", isConnecting,
+		)
 	}
 }

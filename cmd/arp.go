@@ -14,21 +14,23 @@ type DeviceInfo struct {
 // RegisteredMacAddrList 登録済MACアドレスリスト
 var RegisteredMacAddrList = make([]string, 0, 30)
 
-func GetIpAddrList() []string {
-	//IPアドレスとMACアドレスの対応表を取得
+// GetRegisterdDeviceInfos 登録済みのデバイス情報を取得する関数
+func GetRegisterdDeviceInfos() []DeviceInfo {
+	//現在のIPアドレスとMACアドレスの対応表を取得
 	deviceInfos := GetDeviceInfos()
 	PrintDeviceInfos(deviceInfos)
 
-	//登録済みのMACアドレスから各IPアドレスを取得
-	ipAddrList := make([]string, 0, 30)
+	//登録済みのMACアドレスから、各IPアドレスが含まれたDeviceInfoを取得
+	registeredDeviceInfoList := make([]DeviceInfo, 0, 30)
 	for _, macAddr := range RegisteredMacAddrList {
-		ipAddr := SearchIPAddr(deviceInfos, macAddr)
-		if ipAddr != "" {
-			ipAddrList = append(ipAddrList, ipAddr)
+		//MACアドレスからDeviceInfoを取得
+		deviceInfo := SearchDeviceInfoAddr(deviceInfos, macAddr)
+		if deviceInfo.IpAddr != "" {
+			registeredDeviceInfoList = append(registeredDeviceInfoList, deviceInfo)
 		}
 	}
 
-	return ipAddrList
+	return registeredDeviceInfoList
 }
 
 // RegistMacAddrList MACアドレスを新規登録する関数
@@ -82,15 +84,15 @@ func SearchMacAddr(deviceInfos []DeviceInfo, ipAddr string) string {
 	return ""
 }
 
-// SearchIPAddr MACアドレスを検索しIPアドレスを取得する関数
-func SearchIPAddr(deviceInfos []DeviceInfo, macAddr string) string {
+// SearchDeviceInfoAddr MACアドレスを検索しDeviceInfoを取得する関数
+func SearchDeviceInfoAddr(deviceInfos []DeviceInfo, macAddr string) DeviceInfo {
 	for _, deviceInfo := range deviceInfos {
 		//一致するIPを見つけたらMACアドレスを返す
 		if deviceInfo.MacAddr == macAddr {
-			return deviceInfo.IpAddr
+			return deviceInfo
 		}
 	}
-	return ""
+	return DeviceInfo{}
 }
 
 // コマンドの出力を取得する関数
