@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"nantyatte_stay_watch/src/controller"
+	"nantyatte_stay_watch/internal/server/controller"
 )
 
 func Init() {
