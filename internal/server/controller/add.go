@@ -3,7 +3,8 @@ package controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"nantyatte_stay_watch/pkg/commands"
+	"nantyatte_stay_watch/internal/db"
+	. "nantyatte_stay_watch/pkg/model"
 	"net/http"
 )
 
@@ -12,17 +13,17 @@ func Add(c *gin.Context) {
 	//web経由でアクセスしてきたIPアドレスを取得
 	ipFromWeb := c.ClientIP()
 
-	//IPアドレスとMACアドレスの対応表を取得
-	deviceInfos := commands.GetDeviceInfos()
-	commands.PrintDeviceInfos(deviceInfos)
+	//ローカル内の全てのデバイス情報を取得
+	nowDevices := GetNowDevices()
+	nowDevices.Print()
 
-	//MACアドレスを取得
-	macAddr := commands.SearchMacAddr(deviceInfos, ipFromWeb)
-	commands.RegistMacAddrList(macAddr)
+	//IPアドレスをもとにアクセスしてきた端末のDeviceを取得
+	targetDevice := nowDevices.SearchByIpAddr(ipFromWeb)
+	db.RegistMacAddrList(targetDevice.MacAddr)
 
 	//自身のMACアドレスを表示
-	fmt.Println("自身の IPアドレス:", ipFromWeb)
-	fmt.Println("自身のMACアドレス:", macAddr)
+	fmt.Println("自身の IPアドレス:", targetDevice.IpAddr)
+	fmt.Println("自身のMACアドレス:", targetDevice.MacAddr)
 
 	//HTMLを返す
 	c.HTML(http.StatusOK, "index.html", gin.H{})
